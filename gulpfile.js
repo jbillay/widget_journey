@@ -56,6 +56,7 @@ gulp.task('build-css', function() {
 
 gulp.task('watch', function() {
     gulp.watch('src/**/*.js', ['browserify']);
+    gulp.watch('src/**/*.less', ['build-css']);
 });
 
 gulp.task('default', ['build-css', 'browserify', 'connect', 'watch']);

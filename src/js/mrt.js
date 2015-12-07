@@ -11,12 +11,12 @@ var mrtWidgetName = '#mrt_journey';
 // Get parameters
 var mrtRunId = $(mrtWidgetName).attr('run');
 if (typeof mrtRunId === "undefined" ) {
-    runId = 1;
+    mrtRunId = 1;
 }
 
 var mrtApiKey = $(mrtWidgetName).attr('run');
 if (typeof mrtApiKey === "undefined" ) {
-    mrtApiKey = '';
+    mrtApiKey = null;
 }
 
 var mrtRunUrl = "http://localhost:9615/api/run/" + mrtRunId;
@@ -30,11 +30,11 @@ $.ajax({
         var mrtDestinationPoint = response.address_start;
         var mrtStartPoint = '';
 
-        var mrtGlobalFormDiv = $('<div id="mrtForm">');
+        var mrtGlobalFormDiv = $('<div id="mrtForm" class="col-xs-12 col-sm-12 col-md-6">');
 
-        var mrtTitleDiv = $('<div id="mrtTitleForm">');
+        var mrtTitleDiv = $('<div id="mrtTitleForm" class="col-xs-12 col-sm-12 col-md-12">');
 
-        var mrtTitleControl = $('<h3>').append('Création d\'un trajet pour la course ' + response.name);
+        var mrtTitleControl = $('<p>').append($('<strong>').append('Création d\'un trajet pour la course ' + response.name));
         mrtTitleDiv.append(mrtTitleControl);
 
         mrtGlobalFormDiv.append(mrtTitleDiv);
@@ -44,94 +44,125 @@ $.ajax({
         var geocoder = new google.maps.Geocoder();
 
         // Div for search destination
-        var mrtDestinationDiv = $('<div id="mrtDestinationForm">');
-
+        var mrtDestinationDiv = $('<div class="col-xs-12 col-sm-12 col-md-12">');
+        var mrtDestinationGroupDiv = $('<div id="mrtDestinationForm" class="form-group">');
         // Create the search box
-        var controlSearchBox = document.createElement('input');
-        controlSearchBox.id = 'search_address';
-        controlSearchBox.size = '80';
-        controlSearchBox.type = 'text';
-        controlSearchBox.placeholder = 'Lieu de départ';
-        mrtDestinationDiv.append(controlSearchBox);
+        var controlSearchBox = $('<input type="text" id="mrtSearchAddress" placeholder="Lieu de départ" class="form-control">');
+        mrtDestinationDiv.append(mrtDestinationGroupDiv.append(controlSearchBox));
 
         mrtGlobalFormDiv.append(mrtDestinationDiv);
 
         // create read-only inputs for distance and duration display
-        var mrtJourneyInfoDiv = $('<div id="mrtJourneyInfoForm">');
+        var mrtDistanceDiv = $('<div class="col-xs-6 col-sm-6 col-md-6">');
+        var mrtDistanceGroupDiv = $('<div class="form-group">');
+        var mrtDistanceControl = $('<input type="text" id="mrtDistanceCtrl" placeholder="Distance estimée" class="form-control" readonly>');
+        mrtDistanceDiv.append(mrtDistanceGroupDiv.append(mrtDistanceControl));
 
-        var mrtDistanceControl = document.createElement('input');
-        mrtDistanceControl.placeholder = 'Distance estimée';
-        mrtDistanceControl.id = 'mrtDistanceCtrl';
-        mrtDistanceControl.readOnly = true;
-        var mrtDurationControl = document.createElement('input');
-        mrtDurationControl.placeholder = 'Durée estimée';
-        mrtDurationControl.id = 'mrtDurationCtrl';
-        mrtDurationControl.readOnly = true;
-        mrtJourneyInfoDiv.append(mrtDistanceControl);
-        mrtJourneyInfoDiv.append(mrtDurationControl);
+        var mrtDurationDiv = $('<div class="col-xs-6 col-sm-6 col-md-6">');
+        var mrtDurationGroupDiv = $('<div class="form-group">');
+        var mrtDurationControl = $('<input type="text" id="mrtDurationCtrl" placeholder="Durée estimée" class="form-control" readonly>');
+        mrtDurationDiv.append(mrtDurationGroupDiv.append(mrtDurationControl));
 
-        mrtGlobalFormDiv.append(mrtJourneyInfoDiv);
+        mrtGlobalFormDiv.append(mrtDistanceDiv);
+        mrtGlobalFormDiv.append(mrtDurationDiv);
 
         // create select to define type of journey
-        var mrtJourneyTypeDiv = $('<div id="mrtJourneyTypeForm">');
-
-        var arr = [
+        var mrtJourneyTypeDiv = $('<div class="col-xs-6 col-sm-6 col-md-6">');
+        var mrtJourneyTypeGroupDiv = $('<div class="form-group">');
+        var arrJourneyType = [
             {val : 'aller-retour', text: 'Aller-Retour'},
             {val : 'aller', text: 'Aller'},
             {val : 'retour', text: 'Retour'}
         ];
-
-        var mrtTypeJourneyControl = $('<select id="mrtTypeJourneyCtrl">').appendTo(mrtJourneyTypeDiv);
-        $(arr).each(function() {
+        var mrtTypeJourneyControl = $('<select id="mrtTypeJourneyCtrl" class="form-control">').appendTo(mrtJourneyTypeGroupDiv);
+        $(arrJourneyType).each(function() {
             mrtTypeJourneyControl.append($("<option>").attr('value',this.val).text(this.text));
         });
-
+        mrtJourneyTypeDiv.append(mrtJourneyTypeGroupDiv);
         mrtGlobalFormDiv.append(mrtJourneyTypeDiv);
 
         // create div for outward
-        var mrtOutwardFormDiv = $('<div id="mrtOutwardForm">');
+        var mrtOutwardFormDiv = $('<div class="row-fluid" id="mrtOutwardForm">');
 
         // add label for outward
+        var mrtLabelOutwardDiv = $('<div class="col-xs-12 col-sm-12 col-md-12">');
         var mrtLabelOutwardControl = $('<p>').append('Aller');
-        mrtOutwardFormDiv.append(mrtLabelOutwardControl);
+        mrtOutwardFormDiv.append(mrtLabelOutwardDiv.append(mrtLabelOutwardControl));
 
         // add input for date outward
-        var mrtDateOutwardControl = $('<input type="text" id="mrtDateOutward" placeholder="Date">');
-        mrtOutwardFormDiv.append(mrtDateOutwardControl);
+        var mrtDateOutwardDiv = $('<div class="col-xs-12 col-sm-4 col-md-4">');
+        var mrtDateOutwardInputGroup = $('<div class="input-group">');
+        var mrtDateOutwardInputGroupBtn = $('<span class="input-group-btn">');
+        mrtDateOutwardInputGroupBtn.append($('<button type="button" class="btn btn-default">')
+                    .append($('<i class="glyphicon glyphicon-calendar"></i>')));
+        mrtDateOutwardInputGroup.append(mrtDateOutwardInputGroupBtn);
+        mrtDateOutwardInputGroup.append($('<div class="form-group">')
+            .append($('<input type="text" id="mrtDateOutward" class="form-control" placeholder="Date">')));
+        mrtOutwardFormDiv.append(mrtDateOutwardDiv.append(mrtDateOutwardInputGroup));
 
         // add input for time outward
-        var mrtTimeOutwardControl = $('<input type="text" id="mrtTimeOutward" placeholder="Heure">');
-        mrtOutwardFormDiv.append(mrtTimeOutwardControl);
+        var mrtTimeOutwardDiv = $('<div class="col-xs-12 col-sm-4 col-md-4">');
+        var mrtTimeOutwardFormGroupDiv = $('<div class="form-group">');
+        var mrtTimeOutwardInputGroupDiv = $('<div class="input-group">');
+        var mrtTimeOutwardControl = $('<input type="text" id="mrtTimeOutward" placeholder="Heure" class="form-control">');
+        var mrtTimeOutwardSpan = $('<span class="input-group-addon">').append($('<span class="glyphicon glyphicon-time">'));
+        mrtTimeOutwardInputGroupDiv.append(mrtTimeOutwardControl);
+        mrtTimeOutwardInputGroupDiv.append(mrtTimeOutwardSpan);
+        mrtOutwardFormDiv.append(mrtTimeOutwardDiv
+            .append(mrtTimeOutwardFormGroupDiv
+                .append(mrtTimeOutwardFormGroupDiv
+                    .append(mrtTimeOutwardInputGroupDiv))));
 
         // add input for space outward
-        var mrtSpaceOutwardControl = $('<input type="number" id="mrtSpaceOutward" placeholder="Nombre de place">');
-        mrtOutwardFormDiv.append(mrtSpaceOutwardControl);
+        var mrtSpaceOutwardDiv = $('<div class="col-xs-12 col-sm-4 col-md-4">');
+        var mrtSpaceOutwardControl = $('<input type="number" id="mrtSpaceOutward" placeholder="Nombre de place" class="form-control">');
+        mrtOutwardFormDiv.append(mrtSpaceOutwardDiv.append(mrtSpaceOutwardControl));
 
         mrtOutwardFormDiv.appendTo(mrtGlobalFormDiv);
 
         // create div for return
-        var mrtReturnFormDiv = $('<div id="mrtReturnForm">');
+        var mrtReturnFormDiv = $('<div class="row-fluid" id="mrtReturnForm">');
 
-        // add label for outward
+        // add label for return
+        var mrtLabelReturnDiv = $('<div class="col-xs-12 col-sm-12 col-md-12">');
         var mrtLabelReturnControl = $('<p>').append('Retour');
-        mrtReturnFormDiv.append(mrtLabelReturnControl);
+        mrtReturnFormDiv.append(mrtLabelReturnDiv.append(mrtLabelReturnControl));
 
-        // add input for date outward
-        var mrtDateReturnControl = $('<input type="text" id="mrtDateReturn" placeholder="Date">');
-        mrtReturnFormDiv.append(mrtDateReturnControl);
+        // add input for date return
+        var mrtDateReturnDiv = $('<div class="col-xs-12 col-sm-4 col-md-4">');
+        var mrtDateReturnInputGroup = $('<div class="input-group">');
+        var mrtDateReturnInputGroupBtn = $('<span class="input-group-btn">');
+        mrtDateReturnInputGroupBtn.append($('<button type="button" class="btn btn-default">')
+            .append($('<i class="glyphicon glyphicon-calendar"></i>')));
+        mrtDateReturnInputGroup.append(mrtDateReturnInputGroupBtn);
+        mrtDateReturnInputGroup.append($('<div class="form-group">')
+            .append($('<input type="text" id="mrtDateReturn" class="form-control" placeholder="Date">')));
+        mrtReturnFormDiv.append(mrtDateReturnDiv.append(mrtDateReturnInputGroup));
 
-        // add input for time outward
-        var mrtTimeReturnControl = $('<input type="text" id="mrtTimeReturn" placeholder="Heure">');
-        mrtReturnFormDiv.append(mrtTimeReturnControl);
+        // add input for time return
+        var mrtTimeReturnDiv = $('<div class="col-xs-12 col-sm-4 col-md-4">');
+        var mrtTimeReturnFormGroupDiv = $('<div class="form-group">');
+        var mrtTimeReturnInputGroupDiv = $('<div class="input-group">');
+        var mrtTimeReturnControl = $('<input type="text" id="mrtTimeReturn" placeholder="Heure" class="form-control">');
+        var mrtTimeReturnSpan = $('<span class="input-group-addon">').append($('<span class="glyphicon glyphicon-time">'));
+        mrtTimeReturnInputGroupDiv.append(mrtTimeReturnControl);
+        mrtTimeReturnInputGroupDiv.append(mrtTimeReturnSpan);
+        mrtReturnFormDiv.append(mrtTimeReturnDiv
+            .append(mrtTimeReturnFormGroupDiv
+                .append(mrtTimeReturnFormGroupDiv
+                    .append(mrtTimeReturnInputGroupDiv))));
 
-        // add input for space outward
-        var mrtSpaceReturnControl = $('<input type="number" id="mrtSpaceReturn" placeholder="Nombre de place">');
-        mrtReturnFormDiv.append(mrtSpaceReturnControl);
+        // add input for space return
+        var mrtSpaceReturnDiv = $('<div class="col-xs-12 col-sm-4 col-md-4">');
+        var mrtSpaceReturnControl = $('<input type="number" id="mrtSpaceReturn" placeholder="Nombre de place" class="form-control">');
+        mrtReturnFormDiv.append(mrtSpaceReturnDiv.append(mrtSpaceReturnControl));
 
         mrtReturnFormDiv.appendTo(mrtGlobalFormDiv);
 
-        // create div for auto / price info
-        var mrtPriceFormDiv = $('<div id="mrtPriceForm">');
+        // create div for auto info
+        var mrtCarTypeMainDiv = $('<div class="row-fuild">');
+        var mrtCarTypeFormDiv = $('<div class="col-xs-12 col-sm-6 col-md-6">');
+        var mrtCarTypeGroupDiv = $('<div class="form-group">');
 
         var arrCar = [
             {val : 'citadine', text: 'Citadine'},
@@ -143,26 +174,85 @@ $.ajax({
             {val : 'cabriolet', text: 'Cabriolet'}
         ];
 
-        var mrtTypeCarControl = $('<select id="mrtTypeCarCtrl">').appendTo(mrtPriceFormDiv);
+        var mrtTypeCarControl = $('<select id="mrtTypeCarCtrl" class="form-control">').appendTo(mrtCarTypeGroupDiv);
         $(arrCar).each(function() {
             mrtTypeCarControl.append($("<option>").attr('value',this.val).text(this.text));
         });
+        mrtCarTypeMainDiv.append(mrtCarTypeFormDiv.append(mrtCarTypeGroupDiv));
+        mrtCarTypeMainDiv.appendTo(mrtGlobalFormDiv);
 
-        var mrtPriceControl = $('<input type="number" id="mrtAmount" placeholder="Montant par place">');
-        mrtPriceFormDiv.append(mrtPriceControl);
+        // Create div for price info
+        var mrtPriceFormDiv = $('<div class="col-xs-12 col-sm-6 col-md-6">');
+        var mrtPriceFormGroupDiv = $('<div class="form-group">');
+
+        var mrtPriceControl = $('<input type="number" id="mrtAmount" class="form-control" placeholder="Montant par place">');
+        mrtPriceFormDiv.append(mrtPriceFormGroupDiv.append(mrtPriceControl));
 
         mrtPriceFormDiv.appendTo(mrtGlobalFormDiv);
 
         // create div for auto / price info
-        var mrtSubmitFormDiv = $('<div id="mrtSubmitForm">');
+        var mrtSubmitFormDiv = $('<div class="col-xs-12 col-sm-12 col-md-12">');
 
-        var mrtSubmitButtonControl = $('<button class="btn btn-primary">');
+        var mrtSubmitButtonControl = $('<button class="btn btn-primary" id="createJourney">');
         mrtSubmitButtonControl.text('Publier');
         mrtSubmitFormDiv.append(mrtSubmitButtonControl);
 
         mrtSubmitFormDiv.appendTo(mrtGlobalFormDiv);
 
         $(mrtWidgetName).append(mrtGlobalFormDiv);
+
+        // Form for authentification
+        var mrtGlobalAuthDiv = $('<div id="mrtAuth" class="col-xs-12 col-sm-12 col-md-6">');
+
+        var mrtTitleConnectAuthDiv = $('<div id="mrtTitleConnectAuth" class="col-xs-12 col-sm-12 col-md-12">');
+
+        var mrtTitleConnectAuthControl = $('<p>').append($('<strong>').append('Se connecter avec votre compte My Run Trip'));
+        mrtTitleConnectAuthDiv.append(mrtTitleConnectAuthControl);
+
+        var mrtLoginAuthDiv = $('<div class="col-xs-10 col-sm-10 col-md-10">');
+        var mrtLoginAuthInputGroupDiv = $('<div class="input-group">');
+        var mrtLoginAuthSpan = $('<span class="input-group-addon">').append($('<span class="glyphicon glyphicon-time">'));
+        var mrtLoginAuthControl = $('<input type="text" id="mrtLoginAuth" placeholder="Email" class="form-control">');
+        mrtLoginAuthInputGroupDiv.append(mrtLoginAuthSpan);
+        mrtLoginAuthInputGroupDiv.append(mrtLoginAuthControl);
+        mrtTitleConnectAuthDiv.append(mrtLoginAuthDiv
+            .append(mrtLoginAuthInputGroupDiv));
+
+
+        var mrtPasswordAuthDiv = $('<div class="col-xs-10 col-sm-10 col-md-10">');
+        var mrtPasswordAuthInputGroupDiv = $('<div class="input-group">');
+        var mrtPasswordAuthSpan = $('<span class="input-group-addon">').append($('<span class="glyphicon glyphicon-time">'));
+        var mrtPasswordAuthControl = $('<input type="password" id="mrtPasswordAuth" placeholder="Mot de passe" class="form-control">');
+        mrtPasswordAuthInputGroupDiv.append(mrtPasswordAuthSpan);
+        mrtPasswordAuthInputGroupDiv.append(mrtPasswordAuthControl);
+        mrtTitleConnectAuthDiv.append(mrtPasswordAuthDiv
+            .append(mrtPasswordAuthInputGroupDiv));
+
+        var mrtSubmitAuthDiv = $('<div class="col-xs-12 col-sm-12 col-md-12">');
+
+        var mrtSubmitAuthButtonControl = $('<button class="btn btn-primary" id="connectMRT">');
+        mrtSubmitAuthButtonControl.text('Se connecter');
+        mrtSubmitAuthDiv.append(mrtSubmitAuthButtonControl);
+
+        mrtSubmitAuthDiv.appendTo(mrtTitleConnectAuthDiv);
+
+        mrtGlobalAuthDiv.append(mrtTitleConnectAuthDiv);
+
+        var mrtSplitAuthControl = $('<hr class="col-xs-12 col-sm-12 col-md-12">');
+
+        mrtGlobalAuthDiv.append(mrtSplitAuthControl);
+
+        var mrtTitleCreateAuthDiv = $('<div id="mrtTitleConnectAuth" class="col-xs-12 col-sm-12 col-md-12">');
+
+        var mrtTitleCreateAuthControl = $('<p>').append($('<strong>').append('Créer un compte'));
+        mrtTitleCreateAuthDiv.append(mrtTitleCreateAuthControl);
+
+        mrtGlobalAuthDiv.append(mrtTitleCreateAuthDiv);
+
+        $(mrtWidgetName).append(mrtGlobalAuthDiv);
+
+        // Hide Auth form in a first step
+        //$('#mrtAuth').hide();
 
         // Activate datepicker
         $('#mrtDateOutward').datepicker();
@@ -237,5 +327,196 @@ $.ajax({
             }
         });
 
+        var verifyMandatoryFields = function () {
+            var valid = true;
+            // Check if destination field completed
+            if (!$('#mrtSearchAddress').val()) {
+                $('#mrtSearchAddress').parent().addClass('has-error');
+                valid = false;
+            } else {
+                $('#mrtSearchAddress').parent().removeClass('has-error');
+            }
+
+            if ($( "#mrtTypeJourneyCtrl option:selected" ).val() === 'aller-retour') {
+                if (!$('#mrtDateOutward').val()) {
+                    $('#mrtDateOutward').parent().addClass('has-error');
+                    valid = false;
+                } else {
+                    $('#mrtDateOutward').parent().removeClass('has-error');
+                }
+                if (!$('#mrtTimeOutward').val()) {
+                    $('#mrtTimeOutward').parent().addClass('has-error');
+                    valid = false;
+                } else {
+                    $('#mrtTimeOutward').parent().removeClass('has-error');
+                }
+                if (!$('#mrtSpaceOutward').val()) {
+                    $('#mrtSpaceOutward').parent().addClass('has-error');
+                    valid = false;
+                } else {
+                    $('#mrtSpaceOutward').parent().removeClass('has-error');
+                }
+                if (!$('#mrtDateReturn').val()) {
+                    $('#mrtDateReturn').parent().addClass('has-error');
+                    valid = false;
+                } else {
+                    $('#mrtDateReturn').parent().removeClass('has-error');
+                }
+                if (!$('#mrtTimeReturn').val()) {
+                    $('#mrtTimeReturn').parent().addClass('has-error');
+                    valid = false;
+                } else {
+                    $('#mrtTimeReturn').parent().removeClass('has-error');
+                }
+                if (!$('#mrtSpaceReturn').val()) {
+                    $('#mrtSpaceReturn').parent().addClass('has-error');
+                    valid = false;
+                } else {
+                    $('#mrtSpaceReturn').parent().removeClass('has-error');
+                }
+            } else if ($( "#mrtTypeJourneyCtrl option:selected" ).val() === 'aller') {
+                if (!$('#mrtDateOutward').val()) {
+                    $('#mrtDateOutward').parent().addClass('has-error');
+                    valid = false;
+                } else {
+                    $('#mrtDateOutward').parent().removeClass('has-error');
+                }
+                if (!$('#mrtTimeOutward').val()) {
+                    $('#mrtTimeOutward').parent().addClass('has-error');
+                    valid = false;
+                } else {
+                    $('#mrtTimeOutward').parent().removeClass('has-error');
+                }
+                if (!$('#mrtSpaceOutward').val()) {
+                    $('#mrtSpaceOutward').parent().addClass('has-error');
+                    valid = false;
+                } else {
+                    $('#mrtSpaceOutward').parent().removeClass('has-error');
+                }
+            } else if ($( "#mrtTypeJourneyCtrl option:selected" ).val() === 'retour') {
+                if (!$('#mrtDateReturn').val()) {
+                    $('#mrtDateReturn').parent().addClass('has-error');
+                    valid = false;
+                } else {
+                    $('#mrtDateReturn').parent().removeClass('has-error');
+                }
+                if (!$('#mrtTimeReturn').val()) {
+                    $('#mrtTimeReturn').parent().addClass('has-error');
+                    valid = false;
+                } else {
+                    $('#mrtTimeReturn').parent().removeClass('has-error');
+                }
+                if (!$('#mrtSpaceReturn').val()) {
+                    $('#mrtSpaceReturn').parent().addClass('has-error');
+                    valid = false;
+                } else {
+                    $('#mrtSpaceReturn').parent().removeClass('has-error');
+                }
+            }
+
+            // Check if amount field completed
+            if (!$('#mrtAmount').val()) {
+                $('#mrtAmount').parent().addClass('has-error');
+                valid = false;
+            } else {
+                $('#mrtAmount').parent().removeClass('has-error');
+            }
+
+            return valid;
+        };
+
+        $('#createJourney').click(function () {
+            var newJourney = {
+                address_start: null,
+                distance: null,
+                duration: null,
+                journey_type: null,
+                date_start_outward: null,
+                time_start_outward: null,
+                nb_space_outward: null,
+                date_start_return: null,
+                time_start_return: null,
+                nb_space_return: null,
+                car_type: null,
+                amount: null,
+                token: null,
+                Run: {
+                    id: null
+                }
+            };
+
+            if (verifyMandatoryFields()) {
+                newJourney.address_start = $('#mrtSearchAddress').val();
+                newJourney.distance = $('#mrtDistanceCtrl').val();
+                newJourney.duration = $('#mrtDurationCtrl').val();
+                newJourney.journey_type = $('#mrtTypeJourneyCtrl').val();
+                var selectedType = $('#mrtTypeJourneyCtrl').val();
+                if (selectedType === 'aller') {
+                    newJourney.date_start_outward = $('#mrtDateOutward').val();
+                    newJourney.time_start_outward = $('#mrtTimeOutward').val();
+                    newJourney.nb_space_outward = $('#mrtSpaceOutward').val();
+                } else if (selectedType === 'retour') {
+                    newJourney.date_start_return = $('#mrtDateReturn').val();
+                    newJourney.time_start_return = $('#mrtTimeReturn').val();
+                    newJourney.nb_space_return = $('#mrtSpaceReturn').val();
+                } else if (selectedType === 'aller-retour') {
+                    newJourney.date_start_outward = $('#mrtDateOutward').val();
+                    newJourney.time_start_outward = $('#mrtTimeOutward').val();
+                    newJourney.nb_space_outward = $('#mrtSpaceOutward').val();
+                    newJourney.date_start_return = $('#mrtDateReturn').val();
+                    newJourney.time_start_return = $('#mrtTimeReturn').val();
+                    newJourney.nb_space_return = $('#mrtSpaceReturn').val();
+                }
+                newJourney.car_type = $('#mrtTypeCarCtrl').val();
+                newJourney.amount = $('#mrtAmount').val();
+                newJourney.token = mrtApiKey;
+                newJourney.Run.id = mrtRunId;
+
+                var url = 'http://localhost:9615/api/journey';
+
+                $.ajax({
+                    type: "POST",
+                    //dataType: "jsonp",
+                    url: url,
+                    data: {journey: newJourney},
+                    success: function( response ) {
+                        var mrtDraftId = response.journeyKey;
+                        alert('Journey saved as draft : ' + mrtDraftId);
+                        $('#mrtForm').hide();
+                        $('#mrtAuth').show();
+                        $('#connectMRT').click(function () {
+                            var loginUrl = 'http://localhost:9615/login';
+                            var confirmUrl = 'http://localhost:9615/api/journey/confirm';
+                            var credential = {
+                                email: null,
+                                password: null
+                            };
+                            credential.email = $('#mrtLoginAuth').val();
+                            credential.password= $('#mrtPasswordAuth').val();
+                            $.ajax({
+                                type: "POST",
+                                //dataType: "jsonp",
+                                url: loginUrl,
+                                data: credential,
+                                success: function (response) {
+                                    console.log(response);
+                                    var userToken = response.token;
+                                    $.ajax({
+                                        type: "POST",
+                                        url: confirmUrl,
+                                        data: {key: mrtDraftId, token: userToken},
+                                        success: function (response) {
+                                            console.log(response);
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                    }
+                });
+            } else {
+                alert('Some fields are missing');
+            }
+        });
     }
 });

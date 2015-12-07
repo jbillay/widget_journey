@@ -12,7 +12,7 @@
   },
   "scripts": {
     "pre-start": "npm install",
-    "start": "gulp build"
+    "start": "gulp"
   },
   "dependencies": {
     "bootstrap": "^3.3.5",

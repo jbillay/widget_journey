@@ -5,28 +5,30 @@
 
 var $ = require('jquery');
 require('jquery-ui');
+var mrtSettings = {
+    //domain: 'http://localhost:9615'
+    domain: 'https://myruntrip-staging.herokuapp.com'
+};
 
 var mrtWidgetName = '#mrt_journey';
 
 // Get parameters
 var mrtRunId = $(mrtWidgetName).attr('run');
-if (typeof mrtRunId === "undefined" ) {
+if (typeof mrtRunId === 'undefined' ) {
     mrtRunId = 1;
 }
 
 var mrtApiKey = $(mrtWidgetName).attr('run');
-if (typeof mrtApiKey === "undefined" ) {
+if (typeof mrtApiKey === 'undefined' ) {
     mrtApiKey = null;
 }
 
-var mrtRunUrl = "http://localhost:9615/api/run/" + mrtRunId;
+var mrtRunUrl = mrtSettings.domain + '/api/run/' + mrtRunId;
+
 $.ajax({
     url: mrtRunUrl,
-    // Tell jQuery we're expecting JSONP
-    dataType: "jsonp",
-    // Work with the response
+    //dataType: 'jsonp',
     success: function( response ) {
-        // Define var for distance calculation
         var mrtDestinationPoint = response.address_start;
         var mrtStartPoint = '';
 
@@ -201,62 +203,97 @@ $.ajax({
 
         $(mrtWidgetName).append(mrtGlobalFormDiv);
 
-        // Form for authentification
-        var mrtGlobalAuthDiv = $('<div id="mrtAuth" class="col-xs-12 col-sm-12 col-md-6">');
-
-        var mrtTitleConnectAuthDiv = $('<div id="mrtTitleConnectAuth" class="col-xs-12 col-sm-12 col-md-12">');
-
-        var mrtTitleConnectAuthControl = $('<p>').append($('<strong>').append('Se connecter avec votre compte My Run Trip'));
-        mrtTitleConnectAuthDiv.append(mrtTitleConnectAuthControl);
-
-        var mrtLoginAuthDiv = $('<div class="col-xs-10 col-sm-10 col-md-10">');
-        var mrtLoginAuthInputGroupDiv = $('<div class="input-group">');
-        var mrtLoginAuthSpan = $('<span class="input-group-addon">').append($('<span class="glyphicon glyphicon-time">'));
-        var mrtLoginAuthControl = $('<input type="text" id="mrtLoginAuth" placeholder="Email" class="form-control">');
-        mrtLoginAuthInputGroupDiv.append(mrtLoginAuthSpan);
-        mrtLoginAuthInputGroupDiv.append(mrtLoginAuthControl);
-        mrtTitleConnectAuthDiv.append(mrtLoginAuthDiv
-            .append(mrtLoginAuthInputGroupDiv));
-
-
-        var mrtPasswordAuthDiv = $('<div class="col-xs-10 col-sm-10 col-md-10">');
-        var mrtPasswordAuthInputGroupDiv = $('<div class="input-group">');
-        var mrtPasswordAuthSpan = $('<span class="input-group-addon">').append($('<span class="glyphicon glyphicon-time">'));
-        var mrtPasswordAuthControl = $('<input type="password" id="mrtPasswordAuth" placeholder="Mot de passe" class="form-control">');
-        mrtPasswordAuthInputGroupDiv.append(mrtPasswordAuthSpan);
-        mrtPasswordAuthInputGroupDiv.append(mrtPasswordAuthControl);
-        mrtTitleConnectAuthDiv.append(mrtPasswordAuthDiv
-            .append(mrtPasswordAuthInputGroupDiv));
-
-        var mrtSubmitAuthDiv = $('<div class="col-xs-12 col-sm-12 col-md-12">');
-
-        var mrtSubmitAuthButtonControl = $('<button class="btn btn-primary" id="connectMRT">');
-        mrtSubmitAuthButtonControl.text('Se connecter');
-        mrtSubmitAuthDiv.append(mrtSubmitAuthButtonControl);
-
-        mrtSubmitAuthDiv.appendTo(mrtTitleConnectAuthDiv);
-
-        mrtGlobalAuthDiv.append(mrtTitleConnectAuthDiv);
-
-        var mrtSplitAuthControl = $('<hr class="col-xs-12 col-sm-12 col-md-12">');
-
-        mrtGlobalAuthDiv.append(mrtSplitAuthControl);
-
-        var mrtTitleCreateAuthDiv = $('<div id="mrtTitleConnectAuth" class="col-xs-12 col-sm-12 col-md-12">');
-
-        var mrtTitleCreateAuthControl = $('<p>').append($('<strong>').append('Créer un compte'));
-        mrtTitleCreateAuthDiv.append(mrtTitleCreateAuthControl);
-
-        mrtGlobalAuthDiv.append(mrtTitleCreateAuthDiv);
-
-        $(mrtWidgetName).append(mrtGlobalAuthDiv);
-
-        // Hide Auth form in a first step
-        //$('#mrtAuth').hide();
-
         // Activate datepicker
         $('#mrtDateOutward').datepicker();
         $('#mrtDateReturn').datepicker();
+
+        var mrtAuth = {
+            mrtGlobalAuthDiv: $('<div id="mrtAuth" class="col-xs-12 col-sm-12 col-md-6">'),
+            connection: function () {
+                var mrtTitleConnectAuthDiv = $('<div id="mrtTitleConnectAuth" class="col-xs-12 col-sm-12 col-md-12">');
+
+                var mrtTitleConnectAuthControl = $('<p>').append($('<strong>').append('Se connecter avec votre compte My Run Trip'));
+                mrtTitleConnectAuthDiv.append(mrtTitleConnectAuthControl);
+
+                var mrtLoginAuthDiv = $('<div class="col-xs-10 col-sm-10 col-md-10">');
+                var mrtLoginAuthInputGroupDiv = $('<div class="input-group">');
+                var mrtLoginAuthSpan = $('<span class="input-group-addon">').append($('<span class="glyphicon glyphicon-time">'));
+                var mrtLoginAuthControl = $('<input type="text" id="mrtLoginAuth" placeholder="Email" class="form-control">');
+                mrtLoginAuthInputGroupDiv.append(mrtLoginAuthSpan);
+                mrtLoginAuthInputGroupDiv.append(mrtLoginAuthControl);
+                mrtTitleConnectAuthDiv.append(mrtLoginAuthDiv
+                    .append(mrtLoginAuthInputGroupDiv));
+
+
+                var mrtPasswordAuthDiv = $('<div class="col-xs-10 col-sm-10 col-md-10">');
+                var mrtPasswordAuthInputGroupDiv = $('<div class="input-group">');
+                var mrtPasswordAuthSpan = $('<span class="input-group-addon">').append($('<span class="glyphicon glyphicon-time">'));
+                var mrtPasswordAuthControl = $('<input type="password" id="mrtPasswordAuth" placeholder="Mot de passe" class="form-control">');
+                mrtPasswordAuthInputGroupDiv.append(mrtPasswordAuthSpan);
+                mrtPasswordAuthInputGroupDiv.append(mrtPasswordAuthControl);
+                mrtTitleConnectAuthDiv.append(mrtPasswordAuthDiv
+                    .append(mrtPasswordAuthInputGroupDiv));
+
+                var mrtSubmitAuthDiv = $('<div class="col-xs-12 col-sm-12 col-md-12">');
+
+                var mrtSubmitAuthButtonControl = $('<button class="btn btn-primary" id="connectMRT">');
+                mrtSubmitAuthButtonControl.text('Se connecter');
+                mrtSubmitAuthDiv.append(mrtSubmitAuthButtonControl);
+
+                mrtSubmitAuthDiv.appendTo(mrtTitleConnectAuthDiv);
+
+                this.mrtGlobalAuthDiv.append(mrtTitleConnectAuthDiv);
+            },
+            space: function () {
+                var mrtSplitAuthControl = $('<hr class="col-xs-12 col-sm-12 col-md-12">');
+
+                this.mrtGlobalAuthDiv.append(mrtSplitAuthControl);
+            },
+            creation: function () {
+                var mrtTitleCreateAuthDiv = $('<div id="mrtTitleConnectAuth" class="col-xs-12 col-sm-12 col-md-12">');
+
+                var mrtTitleCreateAuthControl = $('<p>').append($('<strong>').append('Créer un compte'));
+                mrtTitleCreateAuthDiv.append(mrtTitleCreateAuthControl);
+
+                this.mrtGlobalAuthDiv.append(mrtTitleCreateAuthDiv);
+            },
+            build: function () {
+                this.connection();
+                $(mrtWidgetName).append(this.mrtGlobalAuthDiv);
+            },
+            show: function () {
+                $('#mrtAuth').show();
+            },
+            hide: function () {
+                $('#mrtAuth').hide();
+            }
+        };
+
+        var mrtValidation = {
+            build: function (id) {
+                var mrtGlobalValidDiv = $('<div id="mrtValidation" class="col-xs-12 col-sm-12 col-md-6">');
+
+                var mrtContentValidDiv = $('<div id="mrtTitleForm" class="col-xs-12 col-sm-12 col-md-12">');
+
+                var mrtContentValidTextThanks = $('<h3>').append('Merci, votre a bien été créé sur le site My Run Trip.');
+                var mrtContentValidTextLink = $('<h3>').append('Vous pouvez le visualiser en cliquant sur le lien suivant ');
+                var mrtContentValidLink = $('<a>').attr('href', 'http://www.myruntrip.com/journey-' + id).append('Votre voyage');
+
+                mrtContentValidDiv.append(mrtContentValidTextThanks
+                    .append(mrtContentValidTextLink
+                        .append(mrtContentValidLink)));
+
+                mrtGlobalValidDiv.append(mrtContentValidDiv);
+
+                $(mrtWidgetName).append(mrtGlobalValidDiv);
+            },
+            show: function () {
+                $('#mrtValidation').show();
+            },
+            hide: function () {
+                $('#mrtValidation').hide();
+            }
+        };
 
         $('#mrtTypeJourneyCtrl').change(function () {
             var selectedType = $('#mrtTypeJourneyCtrl').val();
@@ -337,7 +374,7 @@ $.ajax({
                 $('#mrtSearchAddress').parent().removeClass('has-error');
             }
 
-            if ($( "#mrtTypeJourneyCtrl option:selected" ).val() === 'aller-retour') {
+            if ($("#mrtTypeJourneyCtrl option:selected").val() === 'aller-retour') {
                 if (!$('#mrtDateOutward').val()) {
                     $('#mrtDateOutward').parent().addClass('has-error');
                     valid = false;
@@ -374,7 +411,7 @@ $.ajax({
                 } else {
                     $('#mrtSpaceReturn').parent().removeClass('has-error');
                 }
-            } else if ($( "#mrtTypeJourneyCtrl option:selected" ).val() === 'aller') {
+            } else if ($("#mrtTypeJourneyCtrl option:selected").val() === 'aller') {
                 if (!$('#mrtDateOutward').val()) {
                     $('#mrtDateOutward').parent().addClass('has-error');
                     valid = false;
@@ -393,7 +430,7 @@ $.ajax({
                 } else {
                     $('#mrtSpaceOutward').parent().removeClass('has-error');
                 }
-            } else if ($( "#mrtTypeJourneyCtrl option:selected" ).val() === 'retour') {
+            } else if ($("#mrtTypeJourneyCtrl option:selected").val() === 'retour') {
                 if (!$('#mrtDateReturn').val()) {
                     $('#mrtDateReturn').parent().addClass('has-error');
                     valid = false;
@@ -472,7 +509,7 @@ $.ajax({
                 newJourney.token = mrtApiKey;
                 newJourney.Run.id = mrtRunId;
 
-                var url = 'http://localhost:9615/api/journey';
+                var url = mrtSettings.domain + '/api/journey';
 
                 $.ajax({
                     type: "POST",
@@ -481,12 +518,12 @@ $.ajax({
                     data: {journey: newJourney},
                     success: function( response ) {
                         var mrtDraftId = response.journeyKey;
-                        alert('Journey saved as draft : ' + mrtDraftId);
+                        console.log('Journey saved as draft : ' + mrtDraftId);
                         $('#mrtForm').hide();
-                        $('#mrtAuth').show();
+                        mrtAuth.build();
                         $('#connectMRT').click(function () {
-                            var loginUrl = 'http://localhost:9615/login';
-                            var confirmUrl = 'http://localhost:9615/api/journey/confirm';
+                            var loginUrl = mrtSettings.domain + '/login';
+                            var confirmUrl = mrtSettings.domain + '/api/journey/confirm';
                             var credential = {
                                 email: null,
                                 password: null
@@ -495,18 +532,20 @@ $.ajax({
                             credential.password= $('#mrtPasswordAuth').val();
                             $.ajax({
                                 type: "POST",
-                                //dataType: "jsonp",
                                 url: loginUrl,
                                 data: credential,
                                 success: function (response) {
-                                    console.log(response);
                                     var userToken = response.token;
                                     $.ajax({
                                         type: "POST",
                                         url: confirmUrl,
                                         data: {key: mrtDraftId, token: userToken},
                                         success: function (response) {
-                                            console.log(response);
+                                            if (response.type === 'success') {
+                                                var newJourneyId = response.id;
+                                                mrtAuth.hide();
+                                                mrtValidation.build(newJourneyId);
+                                            }
                                         }
                                     });
                                 }

@@ -54,9 +54,16 @@ gulp.task('build-css', function() {
         .pipe(gulp.dest('dist/css')).on('error', gutil.log);
 });
 
+gulp.task('copy-assets', function() {
+    gulp.src(['node_modules/font-awesome/fonts/*', 'node_modules/bootstrap/dist/fonts/*'])
+        .pipe(gulp.dest('dist/fonts/'));
+    gulp.src('node_modules/jquery-ui/themes/base/images/*')
+        .pipe(gulp.dest('dist/css/images'));
+});
+
 gulp.task('watch', function() {
     gulp.watch('src/**/*.js', ['browserify']);
     gulp.watch('src/**/*.less', ['build-css']);
 });
 
-gulp.task('default', ['build-css', 'browserify', 'connect', 'watch']);
+gulp.task('default', ['build-css', 'copy-assets', 'browserify', 'connect', 'watch']);

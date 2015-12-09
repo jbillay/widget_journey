@@ -6,8 +6,8 @@
 var $ = require('jquery');
 require('jquery-ui');
 var mrtSettings = {
-    //domain: 'http://localhost:9615'
-    domain: 'https://myruntrip-staging.herokuapp.com'
+    domain: 'http://localhost:9615'
+    //domain: 'https://myruntrip-staging.herokuapp.com'
 };
 
 var mrtWidgetName = '#mrt_journey';
@@ -31,6 +31,7 @@ $.ajax({
     success: function( response ) {
         var mrtDestinationPoint = response.address_start;
         var mrtStartPoint = '';
+        var geocoder = new google.maps.Geocoder();
 
         var mrtGlobalFormDiv = $('<div id="mrtForm" class="col-xs-12 col-sm-12 col-md-6">');
 
@@ -40,10 +41,6 @@ $.ajax({
         mrtTitleDiv.append(mrtTitleControl);
 
         mrtGlobalFormDiv.append(mrtTitleDiv);
-
-        // Init Google Map
-        // Define Gecoder
-        var geocoder = new google.maps.Geocoder();
 
         // Div for search destination
         var mrtDestinationDiv = $('<div class="col-xs-12 col-sm-12 col-md-12">');
@@ -195,8 +192,8 @@ $.ajax({
         // create div for auto / price info
         var mrtSubmitFormDiv = $('<div class="col-xs-12 col-sm-12 col-md-12">');
 
-        var mrtSubmitButtonControl = $('<button class="btn btn-primary" id="createJourney">');
-        mrtSubmitButtonControl.text('Publier');
+        var mrtSubmitButtonControl = $('<button class="btn btn-primary pull-right" id="createJourney">');
+        mrtSubmitButtonControl.text('Suivant');
         mrtSubmitFormDiv.append(mrtSubmitButtonControl);
 
         mrtSubmitFormDiv.appendTo(mrtGlobalFormDiv);
@@ -216,23 +213,27 @@ $.ajax({
                 mrtTitleConnectAuthDiv.append(mrtTitleConnectAuthControl);
 
                 var mrtLoginAuthDiv = $('<div class="col-xs-10 col-sm-10 col-md-10">');
+                var mrtLoginAuthFormGroup = $('<div class="form-group">');
                 var mrtLoginAuthInputGroupDiv = $('<div class="input-group">');
-                var mrtLoginAuthSpan = $('<span class="input-group-addon">').append($('<span class="glyphicon glyphicon-time">'));
+                var mrtLoginAuthSpan = $('<span class="input-group-addon">').append($('<i class="fa fa-envelope-o fa-fw">'));
                 var mrtLoginAuthControl = $('<input type="text" id="mrtLoginAuth" placeholder="Email" class="form-control">');
+                mrtLoginAuthFormGroup.append(mrtLoginAuthInputGroupDiv);
                 mrtLoginAuthInputGroupDiv.append(mrtLoginAuthSpan);
                 mrtLoginAuthInputGroupDiv.append(mrtLoginAuthControl);
                 mrtTitleConnectAuthDiv.append(mrtLoginAuthDiv
-                    .append(mrtLoginAuthInputGroupDiv));
+                    .append(mrtLoginAuthFormGroup));
 
 
                 var mrtPasswordAuthDiv = $('<div class="col-xs-10 col-sm-10 col-md-10">');
+                var mrtPasswordAuthFormGroup = $('<div class="form-group">');
                 var mrtPasswordAuthInputGroupDiv = $('<div class="input-group">');
-                var mrtPasswordAuthSpan = $('<span class="input-group-addon">').append($('<span class="glyphicon glyphicon-time">'));
+                var mrtPasswordAuthSpan = $('<span class="input-group-addon">').append($('<i class="fa fa-key fa-fw">'));
                 var mrtPasswordAuthControl = $('<input type="password" id="mrtPasswordAuth" placeholder="Mot de passe" class="form-control">');
+                mrtPasswordAuthFormGroup.append(mrtPasswordAuthInputGroupDiv);
                 mrtPasswordAuthInputGroupDiv.append(mrtPasswordAuthSpan);
                 mrtPasswordAuthInputGroupDiv.append(mrtPasswordAuthControl);
                 mrtTitleConnectAuthDiv.append(mrtPasswordAuthDiv
-                    .append(mrtPasswordAuthInputGroupDiv));
+                    .append(mrtPasswordAuthFormGroup));
 
                 var mrtSubmitAuthDiv = $('<div class="col-xs-12 col-sm-12 col-md-12">');
 
@@ -250,15 +251,74 @@ $.ajax({
                 this.mrtGlobalAuthDiv.append(mrtSplitAuthControl);
             },
             creation: function () {
-                var mrtTitleCreateAuthDiv = $('<div id="mrtTitleConnectAuth" class="col-xs-12 col-sm-12 col-md-12">');
+                var mrtCreateAuthDiv = $('<div id="mrtTitleConnectAuth" class="col-xs-12 col-sm-12 col-md-12">');
+                // Title of form
+                var mrtTitleCreateAuthControl = $('<p>').append($('<strong>').append('Créer un compte My Run Trip'));
+                mrtCreateAuthDiv.append(mrtTitleCreateAuthControl);
 
-                var mrtTitleCreateAuthControl = $('<p>').append($('<strong>').append('Créer un compte'));
-                mrtTitleCreateAuthDiv.append(mrtTitleCreateAuthControl);
+                // Firstname field
+                var mrtFirstnameCreateDiv = $('<div class="col-xs-12 col-sm-6 col-md-6">');
+                var mrtFirstnameCreateFormGroup = $('<div class="form-group">');
+                var mrtFirstnameCreateInput = $('<input type="text" id="mrtCreateFirstname" placeholder="Prénom" class="form-control">');
 
-                this.mrtGlobalAuthDiv.append(mrtTitleCreateAuthDiv);
+                mrtFirstnameCreateDiv.append(mrtFirstnameCreateFormGroup.append(mrtFirstnameCreateInput));
+                mrtFirstnameCreateDiv.appendTo(mrtCreateAuthDiv);
+
+                // Surname field
+                var mrtSurnameCreateDiv = $('<div class="col-xs-12 col-sm-6 col-md-6">');
+                var mrtSurnameCreateFormGroup = $('<div class="form-group">');
+                var mrtSurnameCreateInput = $('<input type="text" id="mrtCreateSurname" placeholder="Nom" class="form-control">');
+
+                mrtSurnameCreateDiv.append(mrtSurnameCreateFormGroup.append(mrtSurnameCreateInput));
+                mrtSurnameCreateDiv.appendTo(mrtCreateAuthDiv);
+
+                // Town field (to be autocompleted)
+                var mrtTownCreateDiv = $('<div class="col-xs-12 col-sm-12 col-md-12">');
+                var mrtTownCreateFormGroup = $('<div class="form-group">');
+                var mrtTownCreateInput = $('<input type="text" id="mrtCreateTown" placeholder="Ville" class="form-control">');
+
+                mrtTownCreateDiv.append(mrtTownCreateFormGroup.append(mrtTownCreateInput));
+                mrtTownCreateDiv.appendTo(mrtCreateAuthDiv);
+
+                // Email field
+                var mrtEmailCreateDiv = $('<div class="col-xs-12 col-sm-12 col-md-12">');
+                var mrtEmailCreateFormGroup = $('<div class="form-group">');
+                var mrtEmailCreateInput = $('<input type="text" id="mrtCreateEmail" placeholder="Email" class="form-control">');
+
+                mrtEmailCreateDiv.append(mrtEmailCreateFormGroup.append(mrtEmailCreateInput));
+                mrtEmailCreateDiv.appendTo(mrtCreateAuthDiv);
+
+                // Password field
+                var mrtPasswordCreateDiv = $('<div class="col-xs-12 col-sm-6 col-md-6">');
+                var mrtPasswordCreateFormGroup = $('<div class="form-group">');
+                var mrtPasswordCreateInput = $('<input type="password" id="mrtCreatePassword" placeholder="Mot de passe" class="form-control">');
+
+                mrtPasswordCreateDiv.append(mrtPasswordCreateFormGroup.append(mrtPasswordCreateInput));
+                mrtPasswordCreateDiv.appendTo(mrtCreateAuthDiv);
+
+                // Confirm password field
+                var mrtConfirmPasswordCreateDiv = $('<div class="col-xs-12 col-sm-6 col-md-6">');
+                var mrtConfirmPasswordCreateFormGroup = $('<div class="form-group">');
+                var mrtConfirmPasswordCreateInput = $('<input type="password" id="mrtCreateConfirmPassword" placeholder="Confirmation" class="form-control">');
+
+                mrtConfirmPasswordCreateDiv.append(mrtConfirmPasswordCreateFormGroup.append(mrtConfirmPasswordCreateInput));
+                mrtConfirmPasswordCreateDiv.appendTo(mrtCreateAuthDiv);
+
+                // Submit button
+                var mrtSubmitCreateDiv = $('<div class="col-xs-12 col-sm-12 col-md-12">');
+
+                var mrtSubmitCreateButtonControl = $('<button class="btn btn-primary" id="createMRT">');
+                mrtSubmitCreateButtonControl.text('Inscription');
+                mrtSubmitCreateDiv.append(mrtSubmitCreateButtonControl);
+
+                mrtSubmitCreateDiv.appendTo(mrtCreateAuthDiv);
+
+                this.mrtGlobalAuthDiv.append(mrtCreateAuthDiv);
             },
             build: function () {
                 this.connection();
+                this.space();
+                this.creation();
                 $(mrtWidgetName).append(this.mrtGlobalAuthDiv);
             },
             show: function () {
@@ -310,40 +370,50 @@ $.ajax({
             }
         });
 
+        var googleLocationSearch = function (request, response) {
+
+            if (geocoder == null) {
+                geocoder = new google.maps.Geocoder();
+            }
+
+            geocoder.geocode({
+                'address': request.term
+            }, function (results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    var searchLoc = results[0].geometry.location;
+                    var lat = results[0].geometry.location.lat();
+                    var lng = results[0].geometry.location.lng();
+                    var latlng = new google.maps.LatLng(lat, lng);
+                    var bounds = results[0].geometry.bounds;
+
+                    geocoder.geocode({
+                        'latLng': latlng
+                    }, function (results1, status1) {
+                        if (status1 == google.maps.GeocoderStatus.OK) {
+                            if (results1[1]) {
+                                response($.map(results1, function (loc) {
+                                    return {
+                                        label: loc.formatted_address,
+                                        value: loc.formatted_address,
+                                        bounds: loc.geometry.bounds
+                                    }
+                                }));
+                            }
+                        }
+                    });
+                }
+            });
+        };
+
+        $('#mrtCreateTown').autocomplete({
+            source:  function (request, response) {
+                googleLocationSearch(request, response);
+            }
+        });
+
         $(controlSearchBox).autocomplete({
             source: function (request, response) {
-
-                if (geocoder == null) {
-                    geocoder = new google.maps.Geocoder();
-                }
-
-                geocoder.geocode({
-                    'address': request.term
-                }, function (results, status) {
-                    if (status == google.maps.GeocoderStatus.OK) {
-                        var searchLoc = results[0].geometry.location;
-                        var lat = results[0].geometry.location.lat();
-                        var lng = results[0].geometry.location.lng();
-                        var latlng = new google.maps.LatLng(lat, lng);
-                        var bounds = results[0].geometry.bounds;
-
-                        geocoder.geocode({
-                            'latLng': latlng
-                        }, function (results1, status1) {
-                            if (status1 == google.maps.GeocoderStatus.OK) {
-                                if (results1[1]) {
-                                    response($.map(results1, function (loc) {
-                                        return {
-                                            label: loc.formatted_address,
-                                            value: loc.formatted_address,
-                                            bounds: loc.geometry.bounds
-                                        }
-                                    }));
-                                }
-                            }
-                        });
-                    }
-                });
+                googleLocationSearch(request, response);
             },
             select: function (event, ui) {
                 mrtStartPoint = ui.item.value;

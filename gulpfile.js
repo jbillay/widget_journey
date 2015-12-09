@@ -66,4 +66,6 @@ gulp.task('watch', function() {
     gulp.watch('src/**/*.less', ['build-css']);
 });
 
+gulp.task('build', ['build-css', 'copy-assets', 'browserify']);
+
 gulp.task('default', ['build-css', 'copy-assets', 'browserify', 'connect', 'watch']);

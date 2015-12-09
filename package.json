@@ -11,8 +11,9 @@
     "npm": "2.14.x"
   },
   "scripts": {
-    "pre-start": "npm install",
-    "start": "gulp"
+    "install": "npm install",
+    "post-install": "gulp build",
+    "start": "gulp connect"
   },
   "dependencies": {
     "bootstrap": "^3.3.5",

@@ -6,8 +6,8 @@
 var $ = require('jquery');
 require('jquery-ui');
 var mrtSettings = {
-    domain: 'http://localhost:9615'
-    //domain: 'https://myruntrip-staging.herokuapp.com'
+    //domain: 'http://localhost:9615'
+    domain: 'https://myruntrip-staging.herokuapp.com'
 };
 
 var mrtWidgetName = '#mrt_journey';

@@ -6,8 +6,8 @@
 var $ = require('jquery');
 require('jquery-ui');
 var mrtSettings = {
-    //domain: 'http://localhost:9615'
-    domain: 'https://myruntrip-staging.herokuapp.com'
+    domain: 'http://localhost:9615'
+    //domain: 'https://myruntrip-staging.herokuapp.com'
 };
 
 var mrtWidgetName = '#mrt_journey';
@@ -18,10 +18,17 @@ if (typeof mrtRunId === 'undefined' ) {
     mrtRunId = 1;
 }
 
-var mrtApiKey = $(mrtWidgetName).attr('run');
+var mrtApiKey = $(mrtWidgetName).attr('api-key');
 if (typeof mrtApiKey === 'undefined' ) {
     mrtApiKey = null;
 }
+
+var mrtWidgetSize = $(mrtWidgetName).attr('size');
+if (typeof mrtWidgetSize === 'undefined' ) {
+    mrtWidgetSize = 1;
+}
+
+var mrtWidgetSizeMd = 6 * mrtWidgetSize;
 
 var mrtRunUrl = mrtSettings.domain + '/api/run/' + mrtRunId;
 
@@ -33,7 +40,7 @@ $.ajax({
         var mrtStartPoint = '';
         var geocoder = new google.maps.Geocoder();
 
-        var mrtGlobalFormDiv = $('<div id="mrtForm" class="col-xs-12 col-sm-12 col-md-6">');
+        var mrtGlobalFormDiv = $('<div id="mrtForm" class="col-xs-12 col-sm-12 col-md-' + mrtWidgetSizeMd + '">');
 
         var mrtTitleDiv = $('<div id="mrtTitleForm" class="col-xs-12 col-sm-12 col-md-12">');
 
@@ -205,7 +212,7 @@ $.ajax({
         $('#mrtDateReturn').datepicker();
 
         var mrtAuth = {
-            mrtGlobalAuthDiv: $('<div id="mrtAuth" class="col-xs-12 col-sm-12 col-md-6">'),
+            mrtGlobalAuthDiv: $('<div id="mrtAuth" class="col-xs-12 col-sm-12 col-md-' + mrtWidgetSizeMd + '">'),
             connection: function () {
                 var mrtTitleConnectAuthDiv = $('<div id="mrtTitleConnectAuth" class="col-xs-12 col-sm-12 col-md-12">');
 
@@ -320,18 +327,82 @@ $.ajax({
                 this.space();
                 this.creation();
                 $(mrtWidgetName).append(this.mrtGlobalAuthDiv);
+
+                $('#mrtCreateTown').autocomplete({
+                    source:  function (request, response) {
+                        googleLocationSearch(request, response);
+                    }
+                });
             },
             show: function () {
                 $('#mrtAuth').show();
             },
             hide: function () {
                 $('#mrtAuth').hide();
+            },
+            validConnect: function () {
+                var valid = true;
+                // Check if destination field completed
+                if (!$('#mrtLoginAuth').val()) {
+                    $('#mrtLoginAuth').parent().addClass('has-error');
+                    valid = false;
+                } else {
+                    $('#mrtLoginAuth').parent().removeClass('has-error');
+                }
+                if (!$('#mrtPasswordAuth').val()) {
+                    $('#mrtPasswordAuth').parent().addClass('has-error');
+                    valid = false;
+                } else {
+                    $('#mrtPasswordAuth').parent().removeClass('has-error');
+                }
+                return valid;
+            },
+            validCreation: function () {
+                var valid = true;
+                // Check if destination field completed
+                if (!$('#mrtCreateFirstname').val()) {
+                    $('#mrtCreateFirstname').parent().addClass('has-error');
+                    valid = false;
+                } else {
+                    $('#mrtCreateFirstname').parent().removeClass('has-error');
+                }
+                if (!$('#mrtCreateSurname').val()) {
+                    $('#mrtCreateSurname').parent().addClass('has-error');
+                    valid = false;
+                } else {
+                    $('#mrtCreateSurname').parent().removeClass('has-error');
+                }
+                if (!$('#mrtCreateTown').val()) {
+                    $('#mrtCreateTown').parent().addClass('has-error');
+                    valid = false;
+                } else {
+                    $('#mrtCreateTown').parent().removeClass('has-error');
+                }
+                if (!$('#mrtCreateEmail').val()) {
+                    $('#mrtCreateEmail').parent().addClass('has-error');
+                    valid = false;
+                } else {
+                    $('#mrtCreateEmail').parent().removeClass('has-error');
+                }
+                if (!$('#mrtCreatePassword').val()) {
+                    $('#mrtCreatePassword').parent().addClass('has-error');
+                    valid = false;
+                } else {
+                    $('#mrtCreatePassword').parent().removeClass('has-error');
+                }
+                if (!$('#mrtCreateConfirmPassword').val()) {
+                    $('#mrtCreateConfirmPassword').parent().addClass('has-error');
+                    valid = false;
+                } else {
+                    $('#mrtCreateConfirmPassword').parent().removeClass('has-error');
+                }
+                return valid;
             }
         };
 
         var mrtValidation = {
             build: function (id) {
-                var mrtGlobalValidDiv = $('<div id="mrtValidation" class="col-xs-12 col-sm-12 col-md-6">');
+                var mrtGlobalValidDiv = $('<div id="mrtValidation" class="col-xs-12 col-sm-12 col-md-' + mrtWidgetSizeMd + '">');
 
                 var mrtContentValidDiv = $('<div id="mrtTitleForm" class="col-xs-12 col-sm-12 col-md-12">');
 
@@ -405,12 +476,6 @@ $.ajax({
             });
         };
 
-        $('#mrtCreateTown').autocomplete({
-            source:  function (request, response) {
-                googleLocationSearch(request, response);
-            }
-        });
-
         $(controlSearchBox).autocomplete({
             source: function (request, response) {
                 googleLocationSearch(request, response);
@@ -434,7 +499,7 @@ $.ajax({
             }
         });
 
-        var verifyMandatoryFields = function () {
+        var verifyMandatoryJourneyFields = function () {
             var valid = true;
             // Check if destination field completed
             if (!$('#mrtSearchAddress').val()) {
@@ -552,7 +617,7 @@ $.ajax({
                 }
             };
 
-            if (verifyMandatoryFields()) {
+            if (verifyMandatoryJourneyFields()) {
                 newJourney.address_start = $('#mrtSearchAddress').val();
                 newJourney.distance = $('#mrtDistanceCtrl').val();
                 newJourney.duration = $('#mrtDurationCtrl').val();
@@ -587,40 +652,98 @@ $.ajax({
                     url: url,
                     data: {journey: newJourney},
                     success: function( response ) {
-                        var mrtDraftId = response.journeyKey;
-                        console.log('Journey saved as draft : ' + mrtDraftId);
-                        $('#mrtForm').hide();
-                        mrtAuth.build();
-                        $('#connectMRT').click(function () {
-                            var loginUrl = mrtSettings.domain + '/login';
-                            var confirmUrl = mrtSettings.domain + '/api/journey/confirm';
-                            var credential = {
-                                email: null,
-                                password: null
-                            };
-                            credential.email = $('#mrtLoginAuth').val();
-                            credential.password= $('#mrtPasswordAuth').val();
-                            $.ajax({
-                                type: "POST",
-                                url: loginUrl,
-                                data: credential,
-                                success: function (response) {
-                                    var userToken = response.token;
+                        if (response.type === 'success') {
+                            var mrtDraftId = response.journeyKey;
+                            console.log('Journey saved as draft : ' + mrtDraftId);
+                            $('#mrtForm').hide();
+                            mrtAuth.build();
+                            $('#connectMRT').click(function () {
+                                var loginUrl = mrtSettings.domain + '/login';
+                                var confirmUrl = mrtSettings.domain + '/api/journey/confirm';
+                                var credential = {
+                                    email: null,
+                                    password: null
+                                };
+                                if (mrtAuth.validConnect()) {
+                                    credential.email = $('#mrtLoginAuth').val();
+                                    credential.password = $('#mrtPasswordAuth').val();
                                     $.ajax({
                                         type: "POST",
-                                        url: confirmUrl,
-                                        data: {key: mrtDraftId, token: userToken},
+                                        url: loginUrl,
+                                        data: credential,
                                         success: function (response) {
                                             if (response.type === 'success') {
-                                                var newJourneyId = response.id;
-                                                mrtAuth.hide();
-                                                mrtValidation.build(newJourneyId);
+                                                var userToken = response.token;
+                                                $.ajax({
+                                                    type: "POST",
+                                                    url: confirmUrl,
+                                                    data: {key: mrtDraftId, token: userToken},
+                                                    success: function (response) {
+                                                        if (response.type === 'success') {
+                                                            var newJourneyId = response.id;
+                                                            mrtAuth.hide();
+                                                            mrtValidation.build(newJourneyId);
+                                                        } else {
+                                                            alert('Malheureusement nous avons rencontré un problème technique');
+                                                        }
+                                                    }
+                                                });
+                                            } else {
+                                                alert('Malheureusement nous avons rencontré un problème technique');
                                             }
                                         }
                                     });
                                 }
                             });
-                        });
+                            $('#createMRT').click(function () {
+                                var creationUrl = mrtSettings.domain + '/api/user';
+                                var confirmUrl = mrtSettings.domain + '/api/journey/confirm';
+                                var user = {
+                                    firstname : null,
+                                    lastname : null,
+                                    address : null,
+                                    email : null,
+                                    password : null,
+                                    password_confirmation : null
+                                };
+                                if (mrtAuth.validCreation()) {
+                                    user.firstname = $('#mrtCreateFirstname').val();
+                                    user.lastname = $('#mrtCreateSurname').val();
+                                    user.address = $('#mrtCreateTown').val();
+                                    user.email = $('#mrtCreateEmail').val();
+                                    user.password = $('#mrtCreatePassword').val();
+                                    user.password_confirmation = $('#mrtCreateConfirmPassword').val();
+                                    $.ajax({
+                                        type: "POST",
+                                        url: creationUrl,
+                                        data: user,
+                                        success: function (response) {
+                                            if (response.type === 'success') {
+                                                var userToken = response.token;
+                                                $.ajax({
+                                                    type: "POST",
+                                                    url: confirmUrl,
+                                                    data: {key: mrtDraftId, token: userToken},
+                                                    success: function (response) {
+                                                        if (response.type === 'success') {
+                                                            var newJourneyId = response.id;
+                                                            mrtAuth.hide();
+                                                            mrtValidation.build(newJourneyId);
+                                                        } else {
+                                                            alert('Malheureusement nous avons rencontré un problème technique');
+                                                        }
+                                                    }
+                                                });
+                                            } else {
+                                                alert('Malheureusement nous avons rencontré un problème technique');
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        } else {
+                            alert('Malheureusement nous avons rencontré un problème technique');
+                        }
                     }
                 });
             } else {

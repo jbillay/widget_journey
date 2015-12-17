@@ -6,6 +6,8 @@ var gulp = require('gulp'),
     browserify = require('browserify'),
     source = require('vinyl-source-stream'),
     gutil   = require('gulp-util'),
+    clean = require('gulp-dest-clean'),
+    zip = require('gulp-zip'),
     plugins = require('gulp-load-plugins')();
 
 gulp.task('connect', function () {
@@ -15,7 +17,12 @@ gulp.task('connect', function () {
     })
 });
 
-gulp.task('browserify', function() {
+gulp.task('clean', function () {
+    return gulp.src('src/', {read: false})
+        .pipe(clean('dist/'));
+});
+
+gulp.task('browserify', ['clean'], function() {
     // Grabs the app.js file
     return browserify('./src/js/mrt.js')
     // bundles it and creates a file called main.js
@@ -26,7 +33,7 @@ gulp.task('browserify', function() {
 });
 
 // Less to CSS: Run manually with: "gulp build-css"
-gulp.task('build-css', function() {
+gulp.task('build-css', ['clean'], function() {
     return gulp.src('src/less/*.less')
         .pipe(plugins.plumber())
         .pipe(plugins.less())
@@ -54,11 +61,30 @@ gulp.task('build-css', function() {
         .pipe(gulp.dest('dist/css')).on('error', gutil.log);
 });
 
-gulp.task('copy-assets', function() {
+gulp.task('copy-assets', ['clean'], function() {
     gulp.src(['node_modules/font-awesome/fonts/*', 'node_modules/bootstrap/dist/fonts/*'])
         .pipe(gulp.dest('dist/fonts/'));
-    gulp.src('node_modules/jquery-ui/themes/base/images/*')
+    return gulp.src('node_modules/jquery-ui/themes/base/images/*')
         .pipe(gulp.dest('dist/css/images'));
+});
+
+gulp.task('wordpress-package', ['wordpress-plugin'], function () {
+    return gulp.src('dist/wordpress/*')
+        .pipe(zip('mrt_widget_journey.zip'))
+        .pipe(gulp.dest('dist/wordpress'));
+});
+
+gulp.task('wordpress-clean', ['wordpress-package'], function () {
+    return gulp.src('src/', {read: false})
+        .pipe(clean('dist/wordpress', '*.zip'));
+});
+
+gulp.task('wordpress-plugin', ['build'], function () {
+    gulp.src('wordpress/**')
+        .pipe(gulp.dest('dist/wordpress/'));
+    return gulp.src(['dist/**/*', '!dist/wordpress'])
+        .pipe(gulp.dest('dist/wordpress/assets'));
+
 });
 
 gulp.task('watch', function() {
@@ -66,6 +92,8 @@ gulp.task('watch', function() {
     gulp.watch('src/**/*.less', ['build-css']);
 });
 
-gulp.task('build', ['build-css', 'copy-assets', 'browserify']);
+gulp.task('build', ['clean', 'build-css', 'copy-assets', 'browserify']);
 
-gulp.task('default', ['build-css', 'copy-assets', 'browserify', 'connect', 'watch']);
+gulp.task('wordpress', ['build', 'wordpress-plugin', 'wordpress-package', 'wordpress-clean']);
+
+gulp.task('default', ['build', 'connect', 'watch']);

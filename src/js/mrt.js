@@ -5,9 +5,11 @@
 
 var $ = require('jquery');
 require('jquery-ui');
+//DEV: 'http://localhost:9615',
+//TEST: 'https://myruntrip-staging.herokuapp.com',
+//PROD: 'https://www.myruntrip.com'
 var mrtSettings = {
-    //domain: 'http://localhost:9615'
-    domain: 'https://myruntrip-staging.herokuapp.com'
+    domain: '/* @echo MRTDomain */'
 };
 
 var mrtWidgetName = '#mrt_journey';

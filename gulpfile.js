@@ -8,19 +8,27 @@ var gulp = require('gulp'),
     gutil   = require('gulp-util'),
     clean = require('gulp-dest-clean'),
     zip = require('gulp-zip'),
+    preprocessify = require('preprocessify'),
     plugins = require('gulp-load-plugins')();
 
-gulp.task('connect', function () {
+gulp.task('connect', ['build'], function () {
     connect.server({
         root: './',
         port: process.env.PORT || 5000
     })
 });
 
-gulp.task('browserify', function() {
+gulp.task('watch', ['build'], function() {
+    gulp.watch('src/**/*.js', ['browserify-live']);
+    gulp.watch('src/**/*.less', ['build-css-live']);
+});
+
+gulp.task('browserify-live', function() {
+    var config = require('konfig')();
     // Grabs the app.js file
     return browserify('./src/js/mrt.js')
-    // bundles it and creates a file called main.js
+        .transform(preprocessify(config.app))
+        // bundles it and creates a file called main.js
         .bundle()
         .pipe(source('main.js'))
         // saves it the public/js/ directory
@@ -28,7 +36,7 @@ gulp.task('browserify', function() {
 });
 
 // Less to CSS: Run manually with: "gulp build-css"
-gulp.task('build-css', function() {
+gulp.task('build-css-live', function() {
     return gulp.src('src/less/*.less')
         .pipe(plugins.plumber())
         .pipe(plugins.less())
@@ -56,7 +64,61 @@ gulp.task('build-css', function() {
         .pipe(gulp.dest('dist/css')).on('error', gutil.log);
 });
 
-gulp.task('copy-assets', function() {
+gulp.task('clean', function () {
+    return gulp.src('src/', {read: false})
+        .pipe(clean('dist'));
+});
+
+gulp.task('set-env-test', function () {
+    return process.env.NODE_ENV = 'test';
+});
+
+gulp.task('set-env-prod', function () {
+    return process.env.NODE_ENV = 'prod';
+});
+
+gulp.task('browserify', ['clean'], function() {
+    var config = require('konfig')();
+    // Grabs the app.js file
+    return browserify('./src/js/mrt.js')
+        .transform(preprocessify(config.app))
+        // bundles it and creates a file called main.js
+        .bundle()
+        .pipe(source('main.js'))
+        // saves it the public/js/ directory
+        .pipe(gulp.dest('./dist/js/'));
+});
+
+// Less to CSS: Run manually with: "gulp build-css"
+gulp.task('build-css', ['clean'], function() {
+    return gulp.src('src/less/*.less')
+        .pipe(plugins.plumber())
+        .pipe(plugins.less())
+        .on('error', function (err) {
+            gutil.log(err);
+            this.emit('end');
+        })
+        .pipe(plugins.autoprefixer(
+            {
+                browsers: [
+                    '> 1%',
+                    'last 2 versions',
+                    'firefox >= 4',
+                    'safari 7',
+                    'safari 8',
+                    'IE 8',
+                    'IE 9',
+                    'IE 10',
+                    'IE 11'
+                ],
+                cascade: false
+            }
+        ))
+        .pipe(plugins.cssmin())
+        .pipe(gulp.dest('dist/css')).on('error', gutil.log);
+});
+
+gulp.task('copy-assets', ['clean'], function() {
     gulp.src(['node_modules/font-awesome/fonts/*', 'node_modules/bootstrap/dist/fonts/*'])
         .pipe(gulp.dest('dist/fonts/'));
     return gulp.src('node_modules/jquery-ui/themes/base/images/*')
@@ -81,13 +143,16 @@ gulp.task('wordpress-clean', ['wordpress-package'], function () {
         .pipe(clean('dist/wordpress', '*.zip'));
 });
 
-gulp.task('watch', function() {
-    gulp.watch('src/**/*.js', ['browserify']);
-    gulp.watch('src/**/*.less', ['build-css']);
-});
+gulp.task('build', ['clean', 'build-css', 'copy-assets', 'browserify']);
 
-gulp.task('build', ['build-css', 'copy-assets', 'browserify']);
+gulp.task('build-test', ['set-env-test', 'build']);
+
+gulp.task('build-prod', ['set-env-prod', 'build']);
 
 gulp.task('wordpress', ['build', 'wordpress-plugin', 'wordpress-package', 'wordpress-clean']);
+
+gulp.task('wordpress-test', ['build-test', 'wordpress-plugin', 'wordpress-package', 'wordpress-clean']);
+
+gulp.task('wordpress-prod', ['build-prod', 'wordpress-plugin', 'wordpress-package', 'wordpress-clean']);
 
 gulp.task('default', ['build', 'connect', 'watch']);

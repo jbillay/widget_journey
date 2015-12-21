@@ -34,7 +34,6 @@ var mrtRunUrl = mrtSettings.domain + '/api/run/' + mrtRunId;
 
 $.ajax({
     url: mrtRunUrl,
-    //dataType: 'jsonp',
     success: function( response ) {
         var mrtDestinationPoint = response.address_start;
         var mrtStartPoint = '';

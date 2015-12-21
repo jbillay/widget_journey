@@ -63,8 +63,15 @@ gulp.task('copy-assets', function() {
         .pipe(gulp.dest('dist/css/images'));
 });
 
+gulp.task('wordpress-plugin', ['build'], function () {
+    gulp.src('wordpress/**')
+        .pipe(gulp.dest('dist/wordpress/'));
+    return gulp.src(['dist/**/*', '!dist/wordpress', '!dist/wordpress/**'])
+        .pipe(gulp.dest('dist/wordpress/assets'));
+});
+
 gulp.task('wordpress-package', ['wordpress-plugin'], function () {
-    return gulp.src('dist/wordpress/*')
+    return gulp.src(['dist/wordpress/**', '!dist/wordpress/mrt_widget_journey.zip'])
         .pipe(zip('mrt_widget_journey.zip'))
         .pipe(gulp.dest('dist/wordpress'));
 });
@@ -72,14 +79,6 @@ gulp.task('wordpress-package', ['wordpress-plugin'], function () {
 gulp.task('wordpress-clean', ['wordpress-package'], function () {
     return gulp.src('src/', {read: false})
         .pipe(clean('dist/wordpress', '*.zip'));
-});
-
-gulp.task('wordpress-plugin', ['build'], function () {
-    gulp.src('wordpress/**')
-        .pipe(gulp.dest('dist/wordpress/'));
-    return gulp.src(['dist/**/*', '!dist/wordpress'])
-        .pipe(gulp.dest('dist/wordpress/assets'));
-
 });
 
 gulp.task('watch', function() {

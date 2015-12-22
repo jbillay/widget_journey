@@ -133,8 +133,12 @@ gulp.task('wordpress-plugin', ['build'], function () {
 });
 
 gulp.task('wordpress-package', ['wordpress-plugin'], function () {
+    var d = new Date();
     return gulp.src(['dist/wordpress/**', '!dist/wordpress/mrt_widget_journey.zip'])
-        .pipe(zip('mrt_widget_journey.zip'))
+        .pipe(zip('mrt_widget_journey_' +
+                    process.env.NODE_ENV + '_' +
+                    d.getFullYear() + (d.getMonth() + 1) + d.getDate() +
+                    '.zip'))
         .pipe(gulp.dest('dist/wordpress'));
 });
 

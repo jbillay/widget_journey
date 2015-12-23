@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="module" version="3.1.0" client="site" method="upgrade">
+    <name>Widget de création de trajet My Run Trip</name>
+    <author>Jeremy Billay</author>
+    <version>1.0.0</version>
+    <description>My Run Trip journey widget module.</description>
+    <files>
+        <filename>mod_mrtjourneywidget.xml</filename>
+        <filename module="mod_mrtjourneywidget">mod_mrtjourneywidget.php</filename>
+        <filename>index.html</filename>
+        <filename>helper.php</filename>
+        <filename>tmpl/default.php</filename>
+        <filename>tmpl/index.html</filename>
+        <filename>assets/js/main.js</filename>
+        <filename>assets/css/mrt.css</filename>
+    </files>
+	<media folder="assets" destination="mod_mrtjourneywidget">
+		<folder>css</folder>
+		<folder>fonts</folder>
+		<folder>js</folder>
+	</media>
+    <config>
+		<fields name="params">
+			<fieldset name="basic">
+				<field name="run_id" type="text"
+					default="19"
+					description="Identifiant de la course"
+					label="Identifiant de la course"
+				/>
+ 
+				<field name="api_key" type="text"
+					default="XXX-XXX"
+					description="Clé partenaire"
+					label="Clé partenaire"
+				/>
+ 
+				<field name="display_size" type="radio"
+					default="1"
+					description="Taille de l'affichage"
+					label="Taille de l'affichage"
+				>
+					<option value="1">Demi page</option>
+					<option value="2">Page entière</option>
+				</field> 
+			</fieldset>
+		</fields>
+    </config>
+</extension>

@@ -147,6 +147,28 @@ gulp.task('wordpress-clean', ['wordpress-package'], function () {
         .pipe(clean('dist/wordpress', '*.zip'));
 });
 
+gulp.task('joomla-plugin', ['build'], function () {
+    gulp.src('joomla/**')
+        .pipe(gulp.dest('dist/joomla/'));
+    return gulp.src(['dist/**/*', '!dist/joomla', '!dist/joomla/**'])
+        .pipe(gulp.dest('dist/joomla/assets'));
+});
+
+gulp.task('joomla-package', ['joomla-plugin'], function () {
+    var d = new Date();
+    return gulp.src(['dist/joomla/**', '!dist/joomla/mrt_widget_journey.zip'])
+        .pipe(zip('mrt_widget_journey_' +
+                    process.env.NODE_ENV + '_' +
+                    d.getFullYear() + (d.getMonth() + 1) + d.getDate() +
+                    '.zip'))
+        .pipe(gulp.dest('dist/joomla'));
+});
+
+gulp.task('joomla-clean', ['joomla-package'], function () {
+    return gulp.src('src/', {read: false})
+        .pipe(clean('dist/joomla', '*.zip'));
+});
+
 gulp.task('build', ['clean', 'build-css', 'copy-assets', 'browserify']);
 
 gulp.task('build-test', ['set-env-test', 'build']);
@@ -159,4 +181,12 @@ gulp.task('wordpress-test', ['build-test', 'wordpress-plugin', 'wordpress-packag
 
 gulp.task('wordpress-prod', ['build-prod', 'wordpress-plugin', 'wordpress-package', 'wordpress-clean']);
 
-gulp.task('default', ['build', 'connect', 'watch']);
+gulp.task('joomla', ['build', 'joomla-plugin', 'joomla-package', 'joomla-clean']);
+
+gulp.task('joomla-test', ['build-test', 'joomla-plugin', 'joomla-package', 'joomla-clean']);
+
+gulp.task('joomla-prod', ['build-prod', 'joomla-plugin', 'joomla-package', 'joomla-clean']);
+
+gulp.task('dev', ['build', 'connect', 'watch']);
+
+gulp.task('default', ['wordpress-prod', 'joomla-prod']);

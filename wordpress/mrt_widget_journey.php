@@ -95,19 +95,19 @@ if(!class_exists('MRT_Widget_Journey'))
     $mrt_widget_journey = new MRT_Widget_Journey();
 
 	function my_scripts_method() {
-		wp_enqueue_style( 'mrt-style', plugins_url( '/assets/css/mrt.css' , __FILE__ ) );
+		wp_enqueue_style( 'mrt-journey-style', plugins_url( '/assets/css/mrt.css' , __FILE__ ) );
 		wp_enqueue_script('google-script', 'https://maps.googleapis.com/maps/api/js', array(), '1.0.0', true);
-		wp_enqueue_script('mrt-script', plugins_url( '/assets/js/main.js' , __FILE__ ), array(), '1.0.0', true);
+		wp_enqueue_script('mrt-journey-script', plugins_url( '/assets/js/main_mrt_journey_widget.js' , __FILE__ ), array(), '1.0.0', true);
 	}
 
 	add_action( 'wp_enqueue_scripts', 'my_scripts_method' );
 		
-	function mrt_widget()
+	function mrt_widget_journey_display()
 	{
 		include(sprintf("%s/templates/widget.html", dirname(__FILE__)));
 	}
 	
-	add_shortcode('mrt_widget', 'mrt_widget');
+	add_shortcode('mrt_widget_journey', 'mrt_widget_journey_display');
 	
 	if(isset($mrt_widget_journey))
 	{

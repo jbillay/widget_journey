@@ -30,7 +30,7 @@ gulp.task('browserify-live', function() {
         .transform(preprocessify(config.app))
         // bundles it and creates a file called main.js
         .bundle()
-        .pipe(source('main.js'))
+        .pipe(source('main_mrt_journey_widget.js'))
         // saves it the public/js/ directory
         .pipe(gulp.dest('./dist/js/'));
 });
@@ -84,7 +84,7 @@ gulp.task('browserify', ['clean'], function() {
         .transform(preprocessify(config.app))
         // bundles it and creates a file called main.js
         .bundle()
-        .pipe(source('main.js'))
+        .pipe(source('main_mrt_journey_widget.js'))
         // saves it the public/js/ directory
         .pipe(gulp.dest('./dist/js/'));
 });

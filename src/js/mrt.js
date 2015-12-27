@@ -681,7 +681,7 @@ $.ajax({
                                                     data: {key: mrtDraftId, token: userToken},
                                                     success: function (response) {
                                                         if (response.type === 'success') {
-                                                            var newJourneyId = response.id;
+                                                            var newJourneyId = response.journey.id;
                                                             mrtAuth.hide();
                                                             mrtValidation.build(newJourneyId);
                                                         } else {
@@ -727,7 +727,7 @@ $.ajax({
                                                     data: {key: mrtDraftId, token: userToken},
                                                     success: function (response) {
                                                         if (response.type === 'success') {
-                                                            var newJourneyId = response.id;
+                                                            var newJourneyId = response.journey.id;
                                                             mrtAuth.hide();
                                                             mrtValidation.build(newJourneyId);
                                                         } else {

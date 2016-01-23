@@ -19,6 +19,6 @@ defined('_JEXEC') or die; ?>
 			document.getElementsByTagName("head")[0].appendChild(fileref)
 	}
 
-	loadjscssfile("<?php echo JURI::base().'media/mod_mrtjourneywidget/js/main.js'; ?>", "js");
+	loadjscssfile("<?php echo JURI::base().'media/mod_mrtjourneywidget/js/main_mrt_journey_widget.js'; ?>", "js");
 	//loadjscssfile("<?php echo JURI::base().'media/mod_mrtjourneywidget/css/mrt.css'; ?>", "css");
 </script>

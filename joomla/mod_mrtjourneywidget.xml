@@ -11,7 +11,7 @@
         <filename>helper.php</filename>
         <filename>tmpl/default.php</filename>
         <filename>tmpl/index.html</filename>
-        <filename>assets/js/main.js</filename>
+        <filename>assets/js/main_mrt_journey_widget.js</filename>
         <filename>assets/css/mrt.css</filename>
     </files>
 	<media folder="assets" destination="mod_mrtjourneywidget">

@@ -5,6 +5,7 @@
 
 var $ = require('jquery');
 require('jquery-ui');
+require('lodash');
 //DEV: 'http://localhost:9615',
 //TEST: 'https://myruntrip-staging.herokuapp.com',
 //PROD: 'https://www.myruntrip.com'
@@ -14,10 +15,23 @@ var mrtSettings = {
 
 var mrtWidgetName = '#mrt_journey';
 
+var mrtRunUrl = mrtSettings.domain;
+var mrtIsRun = null;
+
 // Get parameters
 var mrtRunId = $(mrtWidgetName).attr('run');
 if (typeof mrtRunId === 'undefined' ) {
     mrtRunId = 1;
+    mrtRunUrl = mrtRunUrl + '/api/run/1';
+} else {
+    if (_.isFinite(_.toNumber(mrtRunId))) {
+        mrtRunUrl = mrtRunUrl + '/api/run/' + mrtRunId;
+        mrtIsRun = true;
+    } else if (_.split(mrtRunId, ',')) {
+        mrtRunId = _.map(_.split(mrtRunId, ','), _.trim);
+        mrtRunUrl = mrtRunUrl + '/api/run/list';
+        mrtIsRun = false;
+    }
 }
 
 var mrtApiKey = $(mrtWidgetName).attr('api-key');
@@ -30,25 +44,45 @@ if (typeof mrtWidgetSize === 'undefined' ) {
     mrtWidgetSize = 1;
 }
 
-var mrtWidgetSizeMd = 6 * mrtWidgetSize;
+var mrtWidgetBackgroung = $(mrtWidgetName).attr('background');
 
-var mrtRunUrl = mrtSettings.domain + '/api/run/' + mrtRunId;
+var mrtWidgetSizeMd = 6 * mrtWidgetSize;
 
 $.ajax({
     url: mrtRunUrl,
     success: function( response ) {
-        var mrtDestinationPoint = response.address_start;
         var mrtStartPoint = '';
+        var mrtDestinationPoint = '';
         var geocoder = new google.maps.Geocoder();
 
         var mrtGlobalFormDiv = $('<div id="mrtForm" class="col-xs-12 col-sm-12 col-md-' + mrtWidgetSizeMd + '">');
+        mrtGlobalFormDiv.css('background-color', mrtWidgetBackgroung);
 
         var mrtTitleDiv = $('<div id="mrtTitleForm" class="col-xs-12 col-sm-12 col-md-12">');
 
-        var mrtTitleControl = $('<p>').append($('<strong>').append('Création d\'un trajet pour la course ' + response.name));
-        mrtTitleDiv.append(mrtTitleControl);
-
-        mrtGlobalFormDiv.append(mrtTitleDiv);
+        if (mrtIsRun) {
+            mrtDestinationPoint = response.address_start;
+            var mrtTitleRunControl = $('<p>').append($('<strong>').append('Création d\'un trajet pour la course ' + response.name));
+            mrtTitleDiv.append(mrtTitleRunControl);
+            mrtGlobalFormDiv.append(mrtTitleDiv);
+        } else {
+            if (response.type === 'success') {
+                var mrtTitleListControl = $('<p>').append($('<strong>').append('Création d\'un trajet pour une course de votre choix'));
+                mrtTitleDiv.append(mrtTitleListControl);
+                mrtGlobalFormDiv.append(mrtTitleDiv);
+                var mrtRunSelectDiv = $('<div class="col-xs-12 col-sm-12 col-md-12">');
+                var mrtRunSelectGroupDiv = $('<div class="form-group">');
+                var arrRunSelect = _.filter(response.msg, function(run) { return _.includes(mrtRunId, _.toString(run.id)); });
+                var mrtRunSelectControl = $('<select id="mrtRunSelectCtrl" class="form-control">').appendTo(mrtRunSelectGroupDiv);
+                $(arrRunSelect).each(function() {
+                    mrtRunSelectControl.append($("<option>").attr('value',this.address_start).text(this.name));
+                });
+                mrtRunSelectDiv.append(mrtRunSelectGroupDiv);
+                mrtGlobalFormDiv.append(mrtRunSelectDiv);
+            } else {
+                alert('Impossible de récupérer la liste des courses en raison d\'un problème technique');
+            }
+        }
 
         // Div for search destination
         var mrtDestinationDiv = $('<div class="col-xs-12 col-sm-12 col-md-12">');

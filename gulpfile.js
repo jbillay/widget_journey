@@ -8,6 +8,8 @@ var gulp = require('gulp'),
     gutil   = require('gulp-util'),
     clean = require('gulp-dest-clean'),
     zip = require('gulp-zip'),
+    uglify = require('gulp-uglify'),
+    buffer = require('vinyl-buffer'),
     preprocessify = require('preprocessify'),
     plugins = require('gulp-load-plugins')();
 
@@ -31,6 +33,8 @@ gulp.task('browserify-live', function() {
         // bundles it and creates a file called main.js
         .bundle()
         .pipe(source('main_mrt_journey_widget.js'))
+        .pipe(buffer())
+        .pipe(uglify())
         // saves it the public/js/ directory
         .pipe(gulp.dest('./dist/js/'));
 });
@@ -73,6 +77,10 @@ gulp.task('set-env-test', function () {
     return process.env.NODE_ENV = 'test';
 });
 
+gulp.task('set-env-dev', function () {
+    return process.env.NODE_ENV = 'local';
+});
+
 gulp.task('set-env-prod', function () {
     return process.env.NODE_ENV = 'prod';
 });
@@ -85,6 +93,8 @@ gulp.task('browserify', ['clean'], function() {
         // bundles it and creates a file called main.js
         .bundle()
         .pipe(source('main_mrt_journey_widget.js'))
+        .pipe(buffer())
+        .pipe(uglify())
         // saves it the public/js/ directory
         .pipe(gulp.dest('./dist/js/'));
 });
@@ -187,6 +197,6 @@ gulp.task('joomla-test', ['build-test', 'joomla-plugin', 'joomla-package', 'joom
 
 gulp.task('joomla-prod', ['build-prod', 'joomla-plugin', 'joomla-package', 'joomla-clean']);
 
-gulp.task('dev', ['build', 'connect', 'watch']);
+gulp.task('dev', ['set-env-dev', 'build', 'connect', 'watch']);
 
 gulp.task('default', ['wordpress-prod', 'joomla-prod']);

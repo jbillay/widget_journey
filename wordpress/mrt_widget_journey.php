@@ -3,7 +3,7 @@
 Plugin Name: My Run Trip Widget Création Trajet
 Plugin URI: http://www.myruntrip.com
 Description: A widget to create journey for My Run Trip website
-Version: 0.1
+Version: 0.2.0
 Author: Jeremy Billay
 Author URI: http://www.myruntrip.com
 License: GPL2
@@ -67,6 +67,7 @@ if(!class_exists('MRT_Widget_Journey'))
 			// register the settings for this plugin
 			register_setting('mrt_widget_journey-group', 'run_id');
 			register_setting('mrt_widget_journey-group', 'api_key');
+			register_setting('mrt_widget_journey-group', 'back_color');
 			register_setting('mrt_widget_journey-group', 'display_size');
 		} // END public function init_custom_settings()
 		

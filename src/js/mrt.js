@@ -441,7 +441,7 @@ $.ajax({
 
                 var mrtContentValidDiv = $('<div id="mrtTitleForm" class="col-xs-12 col-sm-12 col-md-12">');
 
-                var mrtContentValidTextThanks = $('<h3>').append('Merci, votre a bien été créé sur le site My Run Trip.');
+                var mrtContentValidTextThanks = $('<h3>').append('Merci, votre voyage a bien été créé sur le site My Run Trip.');
                 var mrtContentValidTextLink = $('<h3>').append('Vous pouvez le visualiser en cliquant sur le lien suivant ');
                 var mrtContentValidLink = $('<a>').attr('href', mrtSettings.domain + '/journey-' + id).append('Votre voyage');
 

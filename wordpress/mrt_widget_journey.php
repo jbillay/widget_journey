@@ -105,7 +105,11 @@ if(!class_exists('MRT_Widget_Journey'))
 		
 	function mrt_widget_journey_display()
 	{
+		ob_start();
 		include(sprintf("%s/templates/widget.html", dirname(__FILE__)));
+		$output_string = ob_get_contents();
+		ob_end_clean();
+        return $output_string;
 	}
 	
 	add_shortcode('mrt_widget_journey', 'mrt_widget_journey_display');
